@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y tcl tcllib expect ruby ruby-dev build-essential
+        pip install pyyaml
+        gem install --user-install asciidoctor-pdf
+        gem install --user-install rouge
+        echo "PATH=$PATH:$(ruby -e 'puts Gem.user_dir')/bin" >> $GITHUB_ENV
+
+    - name: Run tests
+      run: ./test.sh
+
+    - name: Publish Test Result
+      run: cat ~/.local/share/9pm/logs/last/result-gh.md >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload Logs as Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: 9pm-logs
+        path: ~/.local/share/9pm/logs

@@ -1,0 +1,3 @@
+[submodule "9pm"]
+	path = 9pm
+	url = git@github.com:rical/9pm.git
